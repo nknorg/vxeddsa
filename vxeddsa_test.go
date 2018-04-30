@@ -8,6 +8,49 @@ import (
 	"github.com/Scratch-net/vxeddsa/edwards25519"
 )
 
+func TestHonestComplete(t *testing.T) {
+	sk, err := GenerateKey(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pk := sk.Public()
+	alice := []byte("alice")
+	aliceVRF := sk.Compute(alice)
+	aliceVRFFromProof, aliceProof := sk.Prove(alice)
+
+	// fmt.Printf("pk:           %X\n", pk)
+	// fmt.Printf("sk:           %X\n", *sk)
+	// fmt.Printf("alice(bytes): %X\n", alice)
+	// fmt.Printf("aliceVRF:     %X\n", aliceVRF)
+	// fmt.Printf("aliceProof:   %X\n", aliceProof)
+
+	if !pk.Verify(alice, aliceVRF, aliceProof) {
+		t.Error("Gen -> Compute -> Prove -> Verify -> FALSE")
+	}
+	if !bytes.Equal(aliceVRF, aliceVRFFromProof) {
+		t.Error("Compute != Prove")
+	}
+}
+
+func TestFlipBitForgery(t *testing.T) {
+	sk, err := GenerateKey(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pk := sk.Public()
+	alice := []byte("alice")
+	for i := 0; i < 32; i++ {
+		for j := uint(0); j < 8; j++ {
+			aliceVRF := sk.Compute(alice)
+			aliceVRF[i] ^= 1 << j
+			_, aliceProof := sk.Prove(alice)
+			if pk.Verify(alice, aliceVRF, aliceProof) {
+				t.Fatalf("forged by using aliceVRF[%d]^=%d:\n (sk=%x)", i, j, sk)
+			}
+		}
+	}
+}
+
 func TestVxed25519Vectors(t *testing.T) {
 	signature_correct := [96]byte{
 		0x23, 0xc6, 0xe5, 0x93, 0x3f, 0xcd, 0x56, 0x47,
@@ -180,5 +223,44 @@ func TestVxed25519VectorsSlow(t *testing.T) {
 				t.Errorf("VXEDDSA 10m doesn't match %d\n", count)
 			}
 		}
+	}
+}
+
+func BenchmarkCompute(b *testing.B) {
+	sk, err := GenerateKey(nil)
+	if err != nil {
+		b.Fatal(err)
+	}
+	alice := []byte("alice")
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		sk.Compute(alice)
+	}
+}
+
+func BenchmarkProve(b *testing.B) {
+	sk, err := GenerateKey(nil)
+	if err != nil {
+		b.Fatal(err)
+	}
+	alice := []byte("alice")
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		sk.Prove(alice)
+	}
+}
+
+func BenchmarkVerify(b *testing.B) {
+	sk, err := GenerateKey(nil)
+	if err != nil {
+		b.Fatal(err)
+	}
+	alice := []byte("alice")
+	aliceVRF := sk.Compute(alice)
+	_, aliceProof := sk.Prove(alice)
+	pk := sk.Public()
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		pk.Verify(alice, aliceVRF, aliceProof)
 	}
 }
