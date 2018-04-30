@@ -5,7 +5,7 @@ import (
 	"crypto/sha512"
 	"testing"
 
-	"github.com/Scratch-net/vxeddsa/edwards25519"
+	"github.com/nknorg/vxeddsa/edwards25519"
 )
 
 func TestHonestComplete(t *testing.T) {

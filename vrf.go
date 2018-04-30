@@ -1,5 +1,5 @@
-// Package vrf implements a verifiable random function using the Edwards form
-// of Curve25519, SHA3 and the Elligator map.
+// Package vxeddsa implements a verifiable random function using the Edwards form
+// of Curve25519, SHA512 and the Elligator map.
 //
 //     E is Curve25519 (in Edwards coordinates), h is SHA512.
 //     f is the elligator map (bytes->E) that covers half of E.
@@ -22,7 +22,7 @@ import (
 	"crypto/rand"
 	"io"
 
-	"github.com/Scratch-net/vxeddsa/edwards25519"
+	"github.com/nknorg/vxeddsa/edwards25519"
 )
 
 const (

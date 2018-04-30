@@ -6,8 +6,8 @@ import (
 	"crypto/sha512"
 	"io"
 
-	"github.com/Scratch-net/vxeddsa/edwards25519"
-	"github.com/Scratch-net/vxeddsa/extra25519"
+	"github.com/nknorg/vxeddsa/edwards25519"
+	"github.com/nknorg/vxeddsa/extra25519"
 )
 
 // This code is a port of the public domain, VXEdDSA C implementation by Trevor
