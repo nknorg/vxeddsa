@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Scratch-net/vxeddsa/edwards25519"
+	"github.com/nknorg/vxeddsa/edwards25519"
 	"golang.org/x/crypto/curve25519"
 	"golang.org/x/crypto/ed25519"
 )
